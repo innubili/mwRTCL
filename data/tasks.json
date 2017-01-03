@@ -1,0 +1,41 @@
+{
+  "tasks": {
+    "0": {
+      "id": "3",
+      "title": "Task Nr 3",
+      "description": "",
+      "status": "",
+      "statusDate": "2017-01-02 14:57:38",
+      "createDate": "2017-01-02 14:57:38",
+      "createUser": "Administrator",
+      "priority": "0",
+      "category": ""
+    },
+    "1": {
+      "id": "2",
+      "title": "Der zweite Task",
+      "description": "",
+      "status": "",
+      "statusDate": "2017-01-02 14:57:20",
+      "createDate": "2017-01-02 14:57:20",
+      "createUser": "Administrator",
+      "priority": "0",
+      "category": ""
+    },
+    "2": {
+      "id": "1",
+      "title": "Test Task",
+      "description": "",
+      "status": "",
+      "statusDate": "2017-01-02 14:40:57",
+      "createDate": "2017-01-02 14:40:57",
+      "createUser": "Administrator",
+      "priority": "0",
+      "category": "Default"
+    }
+  },
+  "offset": 0,
+  "limit": 15,
+  "total": 3,
+  "screenOutput": ""
+}

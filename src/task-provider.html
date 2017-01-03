@@ -1,0 +1,30 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="tasks-provider">
+    <template>
+        <iron-ajax auto url="../data/tasks.json" last-response="{{data}}"></iron-ajax>
+    </template>
+    
+    <script>
+        Polymer({
+            is: 'tasks-provider',
+            properties: {
+                tasks: {type: Array, notify: true},
+                data: {type: Object, observer: 'tasksLoaded'}
+            },
+            tasksLoaded: function (n, o) {
+                var tasks = [];
+                if (n && n.tasks) {
+                    for (var i in n.tasks) {
+                        tasks.push(n.tasks[i]);
+                    }
+                }
+                this.tasks = tasks;
+            },
+            ready: function () {
+                console.log('tasks-provider ready.');
+            }
+        });
+    </script>
+</dom-module>
