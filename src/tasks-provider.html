@@ -3,7 +3,12 @@
 
 <dom-module id="tasks-provider">
     <template>
-        <iron-ajax auto url="../data/tasks.json" last-response="{{data}}"></iron-ajax>
+        <iron-ajax auto url="../data/tasks.json" handle-as="json" last-response="{{liveTasks}}"></iron-ajax>
+        <app-indexeddb-mirror
+                key="tasks"
+                data="{{liveTasks}}"
+                persisted-data="{{persistedTasks}}">
+        </app-indexeddb-mirror>
     </template>
     
     <script>
@@ -11,7 +16,8 @@
             is: 'tasks-provider',
             properties: {
                 tasks: {type: Array, notify: true},
-                data: {type: Object, observer: 'tasksLoaded'}
+                liveTasks: {type: Object, notify: true, observer: 'tasksLoaded'},
+                persistedTasks: {type: Object, notify: true, observer: 'tasksLoaded'}
             },
             tasksLoaded: function (n, o) {
                 var tasks = [];
@@ -21,6 +27,7 @@
                     }
                 }
                 this.tasks = tasks;
+                console.log('task-provide.tasksLoaded [' + tasks.length + ']');
             },
             ready: function () {
                 console.log('tasks-provider ready.');

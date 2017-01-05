@@ -21,24 +21,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="mrtcl-icons.html">
+<link rel="import" href="shared-styles.html">
 
 <dom-module id="tasks-app">
     <template>
-        <style>
+        <style include="shared-styles">
             :host {
-                --app-primary-color: #4285f4;
-                --app-secondary-color: black;
+                --app-primary-color: #000a64;
+                --app-secondary-color: #000a64;
                 
                 display: block;
             }
             
             app-header {
-                color: #fff;
+                color: var(--text-light);
                 background-color: var(--app-primary-color);
             }
             
             app-header paper-icon-button {
-                --paper-icon-button-ink-color: white;
+                --paper-icon-button-ink-color: var(--text-light);
             }
             
             .drawer-list {
@@ -58,6 +59,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 color: black;
                 font-weight: bold;
             }
+
+            #btnSettings[active] {
+                opacity: 0;
+            }
         </style>
         
         <app-location route="{{route}}"></app-location>
@@ -68,22 +73,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 tail="{{subroute}}"></app-route>
         
         <app-drawer-layout fullbleed>
-            <!-- Drawer content -->
-            <app-drawer id="drawer">
-                <app-toolbar>Menu</app-toolbar>
-                <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-                    <a name="tasks" href="/tasks">Tasks</a>
-                    <a name="settings" href="/settings">Settings</a>
-                </iron-selector>
-            </app-drawer>
+            <!--&lt;!&ndash; Drawer content &ndash;&gt;-->
+            <!--<app-drawer id="drawer">-->
+            <!--<app-toolbar>Menu</app-toolbar>-->
+            <!--<iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">-->
+            <!--<a name="tasks" href="/tasks">Tasks</a>-->
+            <!--<a name="settings" href="/settings">Settings</a>-->
+            <!--</iron-selector>-->
+            <!--</app-drawer>-->
             
             <!-- Main content -->
             <app-header-layout has-scrolling-region>
                 
                 <app-header condenses reveals effects="waterfall">
                     <app-toolbar>
-                        <paper-icon-button icon="mrtcl-icons:menu" drawer-toggle></paper-icon-button>
-                        <div main-title>iCADA's RTCL Tasks</div>
+                        <paper-icon-button id="btnTasks" icon="assignment-turned-in"
+                                           on-tap="showTasks"></paper-icon-button>
+                        <div main-title>{{pageName}}</div>
+                        <paper-icon-button id="btnSettings" icon="more-vert" class="menuBtn" toggles
+                                           on-tap="showSettings"></paper-icon-button>
                     </app-toolbar>
                 </app-header>
                 
@@ -105,6 +113,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             is: 'tasks-app',
 
             properties: {
+                pageName: {type: String, notify: true, value: 'Tasks'},
                 page: {
                     type: String,
                     reflectToAttribute: true,
@@ -119,9 +128,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _routePageChanged: function (page) {
                 this.page = page || 'tasks';
 
-                if (!this.$.drawer.persistent) {
-                    this.$.drawer.close();
-                }
+//                if (!this.$.drawer.persistent) {
+//                    this.$.drawer.close();
+//                }
             },
 
             _pageChanged: function (page) {
@@ -131,8 +140,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
 
             _showPage404: function () {
-                this.page = '404';
+                this.pageName = 'ERROR';
+                this._showPage('404');
             },
+
+            showTasks: function () {
+                this.pageName = 'Tasks';
+                this.$.btnSettings.removeAttribute('active');
+                this.$.btnTasks.setAttribute('icon', 'assignment-turned-in');
+                this._showPage('tasks');
+            },
+
+            showSettings: function () {
+                this.pageName = 'Tasks';
+                this.$.btnTasks.setAttribute('icon', 'chevron-left');
+                this._showPage('settings');
+            },
+            _showPage: function (page) {
+                this.page = page;
+            },
+            ready: function () {
+                this.page = 'tasks';
+                this.pageName = 'iCADA';
+            }
         });
     </script>
 </dom-module>

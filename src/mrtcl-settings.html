@@ -9,6 +9,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="mrtcl-settings">
@@ -16,23 +22,83 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <style include="shared-styles">
             :host {
                 display: block;
-                
-                padding: 10px;
+                padding: 0px;
+            }
+
+            iron-icon {
+                color: var(--text-dark);
+                margin-right: 8px;
+                display: inline-block;
+            }
+
+            paper-input {
+                display: inline-block;
+                margin-bottom: 10px;
+                width: calc(100% - 40px);
+            }
+
+            paper-card.white {
+                --paper-card-header-color: var(--text-brite);
+                --paper-card-header-text: {
+                    paddimg-left: 40px
+                };
+            }
+
+            .btn {
+                color: var(--text-light);
             }
         </style>
-        
-        <div class="card">
-            <div class="circle">2</div>
-            <h1>Settings</h1>
-            <p>Ea duis bonorum nec, falli paulo aliquid ei eum.</p>
-            <p>Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id
-                adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</p>
-        </div>
+    
+        <paper-card heading="Settings" image="../images/settings.png" alt="Settings" class="white">
+            <div class="card-content">
+                <iron-icon id="cloudIcon" icon="cloud" prefix></iron-icon>
+                <paper-input label="Host" value="{{settings.host}}"></paper-input>
+                <br>
+                <iron-icon icon="account-box" prefix></iron-icon>
+                <paper-input label="User Name" value="{{settings.user}}"></paper-input>
+                <br>
+                <iron-icon icon="lock-outline" prefix></iron-icon>
+                <paper-input label="Password" type="password" value="{{settings.password}}"></paper-input>
+            </div>
+            <div class="card-actions">
+                <paper-button class="btn" hidden$="{{loggedin}}" on-tap="login">Login</paper-button>
+                <paper-button class="btn" hidden$="{{!loggedin}}" on-tap="logout">logout</paper-button>
+            </div>
+        </paper-card>
+        <app-localstorage-document key="settings" data="{{settings}}"></app-localstorage-document>
     </template>
     
     <script>
         Polymer({
             is: 'mrtcl-settings',
+            properties: {
+                settings: Object,
+                loggedin: Boolean
+            },
+            observers: [
+                'ping(settings.host)'
+            ],
+            ping: function (host) {
+                if (host) {
+                    console.log('pinging: ' + host);
+                    this.async(function () {
+                        this.$.cloudIcon.icon = 'cloud-queue';
+                    }.bind(this), 10);
+                } else {
+                    this.$.cloudIcon.icon = 'cloud-off';
+                }
+            },
+            login: function () {
+                this.loggedin = true; // todo: fixme
+            },
+            logout: function () {
+                this.loggedin = false; // todo: fixme
+            },
+            ready: function () {
+                console.log('mrtcl.settings.ready');
+                this.settings = this.settings || {host: '', user: '', password: ''};
+                this.loggedin = false;
+            }
         });
     </script>
 </dom-module>
