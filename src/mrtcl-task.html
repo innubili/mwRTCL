@@ -11,6 +11,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 
 <link rel="import" href="shared-styles.html">
@@ -50,7 +52,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             
             .value {
-                @apply(--layout-flex-4);
+                @apply(--layout-flex-6);
                 color: var(--text-dark);
             }
             
@@ -61,6 +63,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             [hidden] {
                 display: none;
             }
+
+            paper-checkbox.dark {
+                padding: 10px;
+                margin-left: -40px;
+    
+                --paper-checkbox-checked-color: var(--text-dark);
+                --paper-checkbox-checked-ink-color: var(--text-dark);
+                --paper-checkbox-unchecked-color: var(--text-dark);
+                --paper-checkbox-unchecked-ink-color: var(--text-dark);
+                --paper-checkbox-label-color: var(--text-dark);
+                --paper-checkbox-label-spacing: 12px;
+            }
         </style>
         
         <paper-card heading="Task: [[task.id]]" image="../images/task.png" alt="Task" class="white">
@@ -70,24 +84,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <div class="value"><strong>{{task.title}}</strong></div>
                 </div>
                 <div class="row" hidden$="{{toHide(task.description)}}">
-                    <div class="label">description:</div>
+                    <div class="label small">description:</div>
                     <div class="value small">{{task.description}}</div>
                 </div>
                 <div class="row">
                     <div class="label">status:</div>
                     <div class="value">{{task.status}}</div>
-                </div>
-                <div class="row">
-                    <div class="label">last update:</div>
-                    <div class="value">{{task.statusDate}}</div>
-                </div>
-                <div class="row">
-                    <div class="label">created:</div>
-                    <div class="value">{{task.createDate}}</div>
-                </div>
-                <div class="row">
-                    <div class="label">created by:</div>
-                    <div class="value">{{task.createUser}}</div>
                 </div>
                 <div class="row">
                     <div class="label">priority:</div>
@@ -97,9 +99,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <div class="label">category:</div>
                     <div class="value">{{task.category}}</div>
                 </div>
+                <br>
+                <div class="row">
+                    <div class="label small">created:</div>
+                    <div class="value small">{{task.createDate}} <span>by: {{task.createUser}}</span></div>
+                </div>
+                <div class="row">
+                    <div class="label small">last update:</div>
+                    <div class="value small">{{task.statusDate}} <span hidden$="{{toHide(task.updateUser)}}">by: {{task.updateUser}}</span>
+                    </div>
+                </div>
             </div>
             <div class="card-actions">
-                <paper-button class="actionBtn" on-tap="update">Update</paper-button>
+                <div class="row">
+                    <div class="label">&nbsp;</div>
+                    <div class="value">
+                        <paper-checkbox id="cbxDone" on-change="toggleDone" class="dark">DONE</paper-checkbox>
+                    </div>
+                </div>
             </div>
         </paper-card>
     </template>
@@ -107,12 +124,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script>
         Polymer({
             is: 'mrtcl-task',
-            properties: {task: Object, notify: true},
+            properties: {
+                task: {type: Object, notify: true, observer: 'setChecked'},
+                _savedTask: {type: Object, notify: true},
+                user: String
+            },
             toHide: function (text) {
                 return !text || text == '';
             },
-            update: function (e) {
-                console.log('mrtcl-task.update > ' + JSON.stringify(this.task));
+            setChecked: function (task) {
+                if (task)
+                    this.$.cbxDone.checked = task.status.toLowerCase() == 'done';
+            },
+            toggleDone: function (e) {
+                if (e.currentTarget.checked) {
+                    this.done();
+                } else {
+                    this.undo();
+                }
+            },
+            done: function (e) {
+                this._savedTask = JSON.parse(JSON.stringify(this.task));
+                this.task.toUpdate = 'true';
+                this.set('task.status', 'DONE');
+                this.set('task.statusDate', moment().format('YYYY-MM-DD HH:mm:ss'));
+                this.set('task.updateUser', this.user);
+                console.log('mrtcl-task.done > ' + JSON.stringify(this.task));
+            },
+            undo: function (e) {
+                if (this._savedTask) {
+                    this.task = JSON.parse(JSON.stringify(this._savedTask));
+                    this._savedTask = null;
+                    console.log('mrtcl-task.undo > ' + JSON.stringify(this.task));
+                }
             }
         });
     </script>

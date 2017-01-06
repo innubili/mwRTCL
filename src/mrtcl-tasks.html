@@ -24,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         </style>
     
-        <tasks-provider tasks="{{tasks}}" url="[[url]]"></tasks-provider>
+        <tasks-provider tasks="{{tasks}}" url="[[url]]" online="{{online}}"></tasks-provider>
         <template is="dom-repeat" items="{{tasks}}">
             <div id="t_{{item.id}}" class="card" on-tap="setTask">
                 <div class="circle">{{item.id}}</div>
@@ -39,7 +39,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             is: 'mrtcl-tasks',
             properties: {
                 tasks: Array,
-                task: {type: Object, notify: true}
+                task: {type: Object, notify: true},
+                online: {type: Boolean, notify: true}
             },
             setTask: function (e) {
                 if (this.tasks && e && e.currentTarget) {

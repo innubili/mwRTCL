@@ -116,8 +116,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         attr-for-selected="name"
                         fallback-selection="404"
                         role="main">
-                    <mrtcl-tasks name="tasks" task="{{task}}" url="{{url}}"></mrtcl-tasks>
-                    <mrtcl-task name="task" task="[[task]]"></mrtcl-task>
+                    <mrtcl-tasks name="tasks" task="{{task}}" url="{{url}}" online="{{online}}"></mrtcl-tasks>
+                    <mrtcl-task name="task" task="[[task]]" user="{{settings.user}}"></mrtcl-task>
                     <mrtcl-settings name="settings" host="{{settings.host}}" user="{{settings.user}}"
                                     password="{{settings.password}}"></mrtcl-settings>
                     <mrtcl-404 name="404"></mrtcl-404>
@@ -149,18 +149,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 '_showTask(task)',
                 'setUrl(settings.host)',
                 'setUrl(settings.user)',
-                'setUrl(settings.password)'
+                'setUrl(settings.password)',
+                'showOnline(online)'
             ],
 
+            showOnline: function (online) {
+                this.$.iCloud.icon = online ? 'cloud-queue' : 'cloud-off';
+            },
+            
             checkOnline: function (e, r) {
                 if (r) {
                     this.online = r.status == 200 && r.response && r.response.tasks;
-                    this.$.iCloud.icon = this.online ? 'cloud-queue' : 'cloud-off';
                 }
             },
             goOffline: function (e, r) {
                 this.online = false;
-                this.$.iCloud.icon = 'cloud-off';
             },
 
             _showTask: function (t) {
@@ -211,7 +214,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (e) {
                     var url = 'http://' + this.settings.host + '/main/task-list/json/?user=' + this.settings.user + '&pass=' + this.settings.password;
                     this.online = false;
-                    this.$.iCloud.icon = 'could-off';
                     this.url = url;
                     this.$.store.data = this.settings;
                     console.log('app.setUrl(' + url + '), data stored');

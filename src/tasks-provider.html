@@ -3,8 +3,8 @@
 
 <dom-module id="tasks-provider">
     <template>
-        <iron-ajax id="ajax" auto url="[[url]]+&offset=0&limit=15" handle-as="json"
-                   last-response="{{liveTasks}}"></iron-ajax>
+        <iron-ajax id="ajax" url="[[url]]+&offset=0&limit=15" handle-as="json"
+                   last-response="{{liveTasks}}" on-error="goOffline" timeout="2000"></iron-ajax>
         <app-indexeddb-mirror
                 key="tasks"
                 data="{{liveTasks}}"
@@ -19,26 +19,39 @@
                 tasks: {type: Array, notify: true},
                 liveTasks: {type: Object, notify: true, observer: 'tasksLoaded'},
                 persistedTasks: {type: Object, notify: true, observer: 'tasksLoaded'},
-                url: {type: String, value: '../data/tasks.json', notify: true}
+                url: {type: String, notify: true, observer: 'fetchNow'},
+                online: {type: Boolean, notify: true}
+            },
+            goOffline: function (e) {
+                this.online = false;
+                console.log('tasks-provider.goOffline');
+                this.fetch();
+            },
+            fetchNow: function () {
+                console.log('task-provider.fetching...');
+                this.$.ajax.generateRequest();
+            },
+            fetch: function (url) {
+                console.log('task-provider.fetch > ' + (url ? url : ' no url'));
+                this.async(function () {
+                    this.fetchNow();
+                }.bind(this), 10000);
             },
             tasksLoaded: function (n, o) {
                 if (n && n.tasks) {
+                    this.online = true;
                     var tasks = [];
                     for (var i in n.tasks) {
                         tasks.push(n.tasks[i]);
                     }
                     this.tasks = tasks;
-                    this.$.ajax.auto = false;
-                    this.$.ajax.url = '';
-                    this.async(function () {
-                        this.$.ajax.url = this.url + '&offset=0&limit=15';
-                        this.$.ajax.auto = true;
-                    }.bind(this), 1000);
                     console.log('task-provider.tasksLoaded [' + tasks.length + ']');
+                    this.fetch();
                 }
             },
             ready: function () {
                 console.log('tasks-provider ready.');
+                this.fetch();
             }
         });
     </script>
