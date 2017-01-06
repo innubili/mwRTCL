@@ -1,0 +1,119 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="mrtcl-task">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 0px;
+            }
+            
+            iron-icon {
+                color: var(--text-dark);
+                margin-right: 8px;
+                display: inline-block;
+            }
+            
+            paper-card.white {
+                --paper-card-header-color: white;
+                --paper-card-header-text: {
+                    padding-left: 52px;
+                    text-shadow: 1px 1px 4px #000a64;
+                };
+            }
+            
+            .row {
+                @apply(--layout-flex);
+                @apply(--layout-horizontal);
+            }
+            
+            .label {
+                @apply(--layout-flex-2);
+                color: var(--text-light);
+                text-align: right;
+                padding-right: 10px;
+            }
+            
+            .value {
+                @apply(--layout-flex-4);
+                color: var(--text-dark);
+            }
+            
+            .small {
+                font-size: smaller;
+            }
+            
+            [hidden] {
+                display: none;
+            }
+        </style>
+        
+        <paper-card heading="Task: [[task.id]]" image="../images/task.png" alt="Task" class="white">
+            <div class="card-content">
+                <div class="row">
+                    <div class="label">title:</div>
+                    <div class="value"><strong>{{task.title}}</strong></div>
+                </div>
+                <div class="row" hidden$="{{toHide(task.description)}}">
+                    <div class="label">description:</div>
+                    <div class="value small">{{task.description}}</div>
+                </div>
+                <div class="row">
+                    <div class="label">status:</div>
+                    <div class="value">{{task.status}}</div>
+                </div>
+                <div class="row">
+                    <div class="label">last update:</div>
+                    <div class="value">{{task.statusDate}}</div>
+                </div>
+                <div class="row">
+                    <div class="label">created:</div>
+                    <div class="value">{{task.createDate}}</div>
+                </div>
+                <div class="row">
+                    <div class="label">created by:</div>
+                    <div class="value">{{task.createUser}}</div>
+                </div>
+                <div class="row">
+                    <div class="label">priority:</div>
+                    <div class="value">{{task.priority}}</div>
+                </div>
+                <div class="row">
+                    <div class="label">category:</div>
+                    <div class="value">{{task.category}}</div>
+                </div>
+            </div>
+            <div class="card-actions">
+                <paper-button class="actionBtn" on-tap="update">Update</paper-button>
+            </div>
+        </paper-card>
+    </template>
+    
+    <script>
+        Polymer({
+            is: 'mrtcl-task',
+            properties: {task: Object, notify: true},
+            toHide: function (text) {
+                return !text || text == '';
+            },
+            update: function (e) {
+                console.log('mrtcl-task.update > ' + JSON.stringify(this.task));
+            }
+        });
+    </script>
+</dom-module>

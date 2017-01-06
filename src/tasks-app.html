@@ -20,6 +20,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+
+<link rel="import" href="mrtcl-settings.html">
+<link rel="import" href="mrtcl-tasks.html">
+<link rel="import" href="mrtcl-task.html">
+<link rel="import" href="mrtcl-404.html">
+
+
 <link rel="import" href="mrtcl-icons.html">
 <link rel="import" href="shared-styles.html">
 
@@ -63,6 +72,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             #btnSettings[active] {
                 opacity: 0;
             }
+
+            #iCloud {
+                color: var(--text-light);
+                opacity: 0.5;
+            }
         </style>
         
         <app-location route="{{route}}"></app-location>
@@ -71,6 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 pattern="/:page"
                 data="{{routeData}}"
                 tail="{{subroute}}"></app-route>
+        <app-localstorage-document id="store" key="settings" data="{{settings}}"></app-localstorage-document>
         
         <app-drawer-layout fullbleed>
             <!--&lt;!&ndash; Drawer content &ndash;&gt;-->
@@ -90,6 +105,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <paper-icon-button id="btnTasks" icon="assignment-turned-in"
                                            on-tap="showTasks"></paper-icon-button>
                         <div main-title>{{pageName}}</div>
+                        <iron-icon id="iCloud" icon="cloud-off"></iron-icon>
                         <paper-icon-button id="btnSettings" icon="more-vert" class="menuBtn" toggles
                                            on-tap="showSettings"></paper-icon-button>
                     </app-toolbar>
@@ -100,12 +116,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         attr-for-selected="name"
                         fallback-selection="404"
                         role="main">
-                    <mrtcl-tasks name="tasks"></mrtcl-tasks>
-                    <mrtcl-settings name="settings"></mrtcl-settings>
+                    <mrtcl-tasks name="tasks" task="{{task}}" url="{{url}}"></mrtcl-tasks>
+                    <mrtcl-task name="task" task="[[task]]"></mrtcl-task>
+                    <mrtcl-settings name="settings" host="{{settings.host}}" user="{{settings.user}}"
+                                    password="{{settings.password}}"></mrtcl-settings>
                     <mrtcl-404 name="404"></mrtcl-404>
                 </iron-pages>
             </app-header-layout>
         </app-drawer-layout>
+        <iron-ajax url="{{url}}" handle-as="json" on-response="checkOnline" on-error="goOffline" auto></iron-ajax>
     </template>
     
     <script>
@@ -118,13 +137,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: String,
                     reflectToAttribute: true,
                     observer: '_pageChanged'
-                }
+                },
+                task: {type: Object, notify: true},
+                online: Boolean,
+                settings: {type: Object, notify: true},
+                url: String
             },
 
             observers: [
                 '_routePageChanged(routeData.page)',
+                '_showTask(task)',
+                'setUrl(settings.host)',
+                'setUrl(settings.user)',
+                'setUrl(settings.password)'
             ],
 
+            checkOnline: function (e, r) {
+                if (r) {
+                    this.online = r.status == 200 && r.response && r.response.tasks;
+                    this.$.iCloud.icon = this.online ? 'cloud-queue' : 'cloud-off';
+                }
+            },
+            goOffline: function (e, r) {
+                this.online = false;
+                this.$.iCloud.icon = 'cloud-off';
+            },
+
+            _showTask: function (t) {
+                if (t) {
+                    this.pageName = 'Tasks';
+                    this.$.btnTasks.setAttribute('icon', 'chevron-left');
+                    this._showPage('task');
+                }
+            },
             _routePageChanged: function (page) {
                 this.page = page || 'tasks';
 
@@ -146,6 +191,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             showTasks: function () {
                 this.pageName = 'Tasks';
+                this.task = null;
                 this.$.btnSettings.removeAttribute('active');
                 this.$.btnTasks.setAttribute('icon', 'assignment-turned-in');
                 this._showPage('tasks');
@@ -156,9 +202,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.$.btnTasks.setAttribute('icon', 'chevron-left');
                 this._showPage('settings');
             },
+
             _showPage: function (page) {
                 this.page = page;
             },
+
+            setUrl: function (e) {
+                if (e) {
+                    var url = 'http://' + this.settings.host + '/main/task-list/json/?user=' + this.settings.user + '&pass=' + this.settings.password;
+                    this.online = false;
+                    this.$.iCloud.icon = 'could-off';
+                    this.url = url;
+                    this.$.store.data = this.settings;
+                    console.log('app.setUrl(' + url + '), data stored');
+                }
+            },
+            
             ready: function () {
                 this.page = 'tasks';
                 this.pageName = 'iCADA';

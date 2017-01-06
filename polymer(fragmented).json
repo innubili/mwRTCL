@@ -1,6 +1,12 @@
 {
   "entrypoint": "index.html",
   "shell": "src/tasks-app.html",
+  "fragments": [
+    "src/mrtcl-tasks.html",
+    "src/mrtcl-task.html",
+    "src/mrtcl-settings.html",
+    "src/mrtcl-404.html"
+  ],
   "sourceGlobs": [
     "src/**/*",
     "images/**/*",

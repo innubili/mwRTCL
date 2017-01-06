@@ -23,10 +23,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding: 10px;
             }
         </style>
-        
-        <tasks-provider tasks="{{tasks}}"></tasks-provider>
+    
+        <tasks-provider tasks="{{tasks}}" url="[[url]]"></tasks-provider>
         <template is="dom-repeat" items="{{tasks}}">
-            <div class="card">
+            <div id="t_{{item.id}}" class="card" on-tap="setTask">
                 <div class="circle">{{item.id}}</div>
                 <h1>{{item.title}}</h1>
                 <p>{{item.statusDate}}</p>
@@ -36,7 +36,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     
     <script>
         Polymer({
-            is: 'mrtcl-tasks'
+            is: 'mrtcl-tasks',
+            properties: {
+                tasks: Array,
+                task: {type: Object, notify: true}
+            },
+            setTask: function (e) {
+                if (this.tasks && e && e.currentTarget) {
+                    var taskId = e.currentTarget.id.replace('t_', '');
+                    for (var i in this.tasks) {
+                        if (this.tasks[i].id == taskId) {
+                            this.task = this.tasks[i];
+                        }
+                    }
+                }
+            }
         });
     </script>
 </dom-module>

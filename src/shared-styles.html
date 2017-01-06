@@ -9,13 +9,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 
 <!-- shared styles for all views -->
 <dom-module id="shared-styles">
     <template>
         <style>
             :host {
-                --text-brite: #b6b9cf;
+                --text-bright: #b6b9cf;
                 --text-dark: #000a64;
                 --text-light: lightgray;
             }
@@ -44,6 +45,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 margin: 16px 0;
                 color: #212121;
                 font-size: 22px;
+            }
+
+            .actionBtn {
+                color: var(--text-light);
             }
         </style>
     </template>

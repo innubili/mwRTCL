@@ -12,7 +12,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 
 <link rel="import" href="shared-styles.html">
@@ -38,66 +37,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             paper-card.white {
-                --paper-card-header-color: var(--text-brite);
+                --paper-card-header-color: var(--text-bright);
                 --paper-card-header-text: {
-                    paddimg-left: 40px
+                    padding-left: 52px
                 };
             }
-
-            .btn {
-                color: var(--text-light);
-            }
         </style>
-    
         <paper-card heading="Settings" image="../images/settings.png" alt="Settings" class="white">
             <div class="card-content">
                 <iron-icon id="cloudIcon" icon="cloud" prefix></iron-icon>
-                <paper-input label="Host" value="{{settings.host}}"></paper-input>
+                <paper-input label="Host" value="{{host}}" placeholder="xxx.xxx.xxx.xxx:PORT"></paper-input>
                 <br>
                 <iron-icon icon="account-box" prefix></iron-icon>
-                <paper-input label="User Name" value="{{settings.user}}"></paper-input>
+                <paper-input label="User Name" min="2" value="{{user}}"></paper-input>
                 <br>
                 <iron-icon icon="lock-outline" prefix></iron-icon>
-                <paper-input label="Password" type="password" value="{{settings.password}}"></paper-input>
+                <paper-input label="Password" type="password" value="{{password}}"></paper-input>
             </div>
-            <div class="card-actions">
-                <paper-button class="btn" hidden$="{{loggedin}}" on-tap="login">Login</paper-button>
-                <paper-button class="btn" hidden$="{{!loggedin}}" on-tap="logout">logout</paper-button>
-            </div>
+            <!--<div class="card-actions">-->
+            <!--<div class="actionBtn" hidden$="{{!online}}">online</div>-->
+            <!--<div class="actionBtn" hidden$="{{online}}">offline</div>-->
+            <!--</div>-->
         </paper-card>
-        <app-localstorage-document key="settings" data="{{settings}}"></app-localstorage-document>
     </template>
     
     <script>
         Polymer({
             is: 'mrtcl-settings',
             properties: {
-                settings: Object,
-                loggedin: Boolean
-            },
-            observers: [
-                'ping(settings.host)'
-            ],
-            ping: function (host) {
-                if (host) {
-                    console.log('pinging: ' + host);
-                    this.async(function () {
-                        this.$.cloudIcon.icon = 'cloud-queue';
-                    }.bind(this), 10);
-                } else {
-                    this.$.cloudIcon.icon = 'cloud-off';
-                }
-            },
-            login: function () {
-                this.loggedin = true; // todo: fixme
-            },
-            logout: function () {
-                this.loggedin = false; // todo: fixme
+                host: {type: String, notify: true},
+                user: {type: String, notify: true},
+                password: {type: String, notify: true}
             },
             ready: function () {
                 console.log('mrtcl.settings.ready');
-                this.settings = this.settings || {host: '', user: '', password: ''};
-                this.loggedin = false;
             }
         });
     </script>

@@ -3,7 +3,8 @@
 
 <dom-module id="tasks-provider">
     <template>
-        <iron-ajax auto url="../data/tasks.json" handle-as="json" last-response="{{liveTasks}}"></iron-ajax>
+        <iron-ajax id="ajax" auto url="[[url]]+&offset=0&limit=15" handle-as="json"
+                   last-response="{{liveTasks}}"></iron-ajax>
         <app-indexeddb-mirror
                 key="tasks"
                 data="{{liveTasks}}"
@@ -17,17 +18,24 @@
             properties: {
                 tasks: {type: Array, notify: true},
                 liveTasks: {type: Object, notify: true, observer: 'tasksLoaded'},
-                persistedTasks: {type: Object, notify: true, observer: 'tasksLoaded'}
+                persistedTasks: {type: Object, notify: true, observer: 'tasksLoaded'},
+                url: {type: String, value: '../data/tasks.json', notify: true}
             },
             tasksLoaded: function (n, o) {
-                var tasks = [];
                 if (n && n.tasks) {
+                    var tasks = [];
                     for (var i in n.tasks) {
                         tasks.push(n.tasks[i]);
                     }
+                    this.tasks = tasks;
+                    this.$.ajax.auto = false;
+                    this.$.ajax.url = '';
+                    this.async(function () {
+                        this.$.ajax.url = this.url + '&offset=0&limit=15';
+                        this.$.ajax.auto = true;
+                    }.bind(this), 1000);
+                    console.log('task-provider.tasksLoaded [' + tasks.length + ']');
                 }
-                this.tasks = tasks;
-                console.log('task-provide.tasksLoaded [' + tasks.length + ']');
             },
             ready: function () {
                 console.log('tasks-provider ready.');
